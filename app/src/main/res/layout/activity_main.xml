@@ -35,12 +35,22 @@
         app:layout_constraintTop_toBottomOf="@+id/scanner" />
     <Button
         android:layout_width="match_parent"
-        android:layout_height="20sp"
+        android:layout_height="30sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/codegenerated"
         android:text="pin enter"
         android:id="@+id/pin"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="30sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pin"
+        android:text="notif starter"
+        android:onClick="onStartJobIntentService"
+        android:id="@+id/notif"
         />
     <ImageView
         android:layout_width="300sp"

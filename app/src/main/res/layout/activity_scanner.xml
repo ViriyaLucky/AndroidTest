@@ -13,6 +13,30 @@
         android:id="@+id/scannerAndroid"
         >
     </me.dm7.barcodescanner.zxing.ZXingScannerView>
+    <Button
+        android:id="@+id/FlashON"
+        android:onClick="flashON"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/FlashOFF"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/FlashOFF"
+        android:layout_marginEnd="60dp"
+        android:layout_marginRight="60dp"
+        android:background="@drawable/ic_baseline_flash_on_24"
+        android:text="Nyalakan Flashlight"/>
+
+    <Button
+        android:id="@+id/FlashOFF"
+        android:onClick="flashOFF"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="13dp"
+        android:layout_marginRight="13dp"
+        android:background="@drawable/ic_baseline_flash_off_24"
+        android:text="Matikan Flashlight"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="200sp"

@@ -2,7 +2,13 @@ package com.ski.myapplication;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,6 +16,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +36,7 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String ALLOWED_CHARACTERS ="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String NOTIFICATION_CHANNEL_ID = "channel";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         Button scan = (Button) findViewById(R.id.scanner);
         final int min = 1111;
         final int max = 9999;
+        final Button notif = (Button) findViewById(R.id.notif);
+
         gen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
@@ -90,6 +100,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(aa);
             }
         });
+//        notif.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view)
+//            {
+//                YourService.enqueueWork(getApplicationContext(), new Intent());
+//
+//            }
+//        });
         pin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
@@ -107,5 +125,35 @@ public class MainActivity extends AppCompatActivity {
         for(int i=0;i<sizeOfRandomString;++i)
             sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
         return sb.toString();
+    }
+    public void onStartJobIntentService(View view) {
+
+//        NotificationManager notificationManager = (NotificationManager)       getSystemService(Context.NOTIFICATION_SERVICE);
+//        String NOTIFICATION_CHANNEL_ID = "tutorialspoint_01";
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            @SuppressLint("WrongConstant") NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_MAX);
+//            // Configure the notification channel.
+//            notificationChannel.setDescription("Sample Channel description");
+//            notificationChannel.enableLights(true);
+//            notificationChannel.setLightColor(Color.RED);
+//            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+//            notificationChannel.enableVibration(true);
+//            notificationManager.createNotificationChannel(notificationChannel);
+//        }
+//        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+//        notificationBuilder.setAutoCancel(true)
+//                .setDefaults(Notification.DEFAULT_ALL)
+//                .setWhen(System.currentTimeMillis())
+//                .setSmallIcon(R.mipmap.ic_launcher)
+//                .setTicker("Tutorialspoint")
+//                //.setPriority(Notification.PRIORITY_MAX)
+//                .setContentTitle("sample notification")
+//                .setContentText("This is sample notification")
+//                .setContentInfo("Information");
+//        notificationManager.notify(1, notificationBuilder.build());
+
+        Intent mIntent = new Intent(this, YourService.class);
+        mIntent.putExtra("maxCountValue", 1000);
+        YourService.enqueueWork(this, mIntent);
     }
 }

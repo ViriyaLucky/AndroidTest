@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.google.zxing.Result;
@@ -20,7 +21,6 @@ public class Scanner extends AppCompatActivity implements ZXingScannerView.Resul
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner);
         mScannerView = (ZXingScannerView) findViewById(R.id.scannerAndroid);
-        RelativeLayout rl = (RelativeLayout) findViewById(R.id.rel_scan);
         mScannerView.setResultHandler(this);
         mScannerView.setBorderColor(Color.WHITE);
         mScannerView.setBorderCornerRadius(100);
@@ -51,5 +51,12 @@ public class Scanner extends AppCompatActivity implements ZXingScannerView.Resul
     public void onPause() {
         super.onPause();
         mScannerView.stopCamera();
+    }
+    public void flashON(View v) {
+        mScannerView.setFlash(true);
+    }
+
+    public void flashOFF(View v){
+        mScannerView.setFlash(false);
     }
 }
