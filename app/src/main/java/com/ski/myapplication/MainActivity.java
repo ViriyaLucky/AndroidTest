@@ -1,15 +1,24 @@
 package com.ski.myapplication;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.Observer;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,12 +27,18 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 import com.google.zxing.WriterException;
@@ -35,8 +50,10 @@ import java.util.Random;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String MESSAGE_STATUS = "message_status";
     private static final String ALLOWED_CHARACTERS ="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String NOTIFICATION_CHANNEL_ID = "channel";
+    public MyTestReceiver receiverForTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +66,33 @@ public class MainActivity extends AppCompatActivity {
         final int min = 1111;
         final int max = 9999;
         final Button notif = (Button) findViewById(R.id.notif);
+        final WorkManager mWorkManager = WorkManager.getInstance();
+        final OneTimeWorkRequest mRequest = new OneTimeWorkRequest.Builder(NotificationWorker.class).build();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel("NotifApps", "NotifyApps", NotificationManager.IMPORTANCE_HIGH);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
 
+        getCurrentFirebaseToken();
+        notif.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+//                mWorkManager.enqueue(mRequest);
+
+                onStartJobIntentService(view);
+            }
+        });
+        mWorkManager.getWorkInfoByIdLiveData(mRequest.getId()).observe(this, new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(@Nullable WorkInfo workInfo) {
+                if (workInfo != null) {
+                    WorkInfo.State state = workInfo.getState();
+                    ((TextView) findViewById(R.id.codegenerated)).setText(state.toString());
+                }
+            }
+        });
         gen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
@@ -127,33 +170,33 @@ public class MainActivity extends AppCompatActivity {
         return sb.toString();
     }
     public void onStartJobIntentService(View view) {
+//        Intent mIntent = new Intent(this, YourService.class);
+        Intent mIntent = new Intent(this, MyFirebaseMessagingService.class);
 
-//        NotificationManager notificationManager = (NotificationManager)       getSystemService(Context.NOTIFICATION_SERVICE);
-//        String NOTIFICATION_CHANNEL_ID = "tutorialspoint_01";
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            @SuppressLint("WrongConstant") NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_MAX);
-//            // Configure the notification channel.
-//            notificationChannel.setDescription("Sample Channel description");
-//            notificationChannel.enableLights(true);
-//            notificationChannel.setLightColor(Color.RED);
-//            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-//            notificationChannel.enableVibration(true);
-//            notificationManager.createNotificationChannel(notificationChannel);
-//        }
-//        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
-//        notificationBuilder.setAutoCancel(true)
-//                .setDefaults(Notification.DEFAULT_ALL)
-//                .setWhen(System.currentTimeMillis())
-//                .setSmallIcon(R.mipmap.ic_launcher)
-//                .setTicker("Tutorialspoint")
-//                //.setPriority(Notification.PRIORITY_MAX)
-//                .setContentTitle("sample notification")
-//                .setContentText("This is sample notification")
-//                .setContentInfo("Information");
-//        notificationManager.notify(1, notificationBuilder.build());
-
-        Intent mIntent = new Intent(this, YourService.class);
         mIntent.putExtra("maxCountValue", 1000);
         YourService.enqueueWork(this, mIntent);
+    }
+    private void getCurrentFirebaseToken(){
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("TAG", "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        Log.e("currentToken", token);
+
+                        // Log and toast
+                    }
+                });
+    }
+
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
     }
 }
