@@ -10,10 +10,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-/**
- * Created on : Mar 26, 2019
- * Author     : AndroidWave
- */
+
 public class NotificationWorker extends Worker {
     private static final String WORK_RESULT = "work_result";
     public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
